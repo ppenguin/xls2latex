@@ -43,16 +43,16 @@ No user-friendly method yet, just copy/clone.
 I used a `poetry` environment, so you could do the same to handle dependencies.
 
 # Broader Background
-# Why?
-## Reason
+## Why?
+### Reason
 If, like me, you replaced your documentation workflow to make e.g. letters, reports, quotations, etc. 
 from well-known office software to markdown, you may be faced with the challenge of including external tables.
 
 Since for this workflow my output format is still the "traditional" `pdf`, it makes sense to use `LaTeX` as an intermediate format.
 Enter [Pandoc](https://pandoc.org/).
 
-# How?
-## Workflow
+## How?
+### Workflow
 If you want to leverage the `markdown - pandoc LaTeX - pdf` workflow to the fullest, it is advisable to fine-tune the workflow
 in such a way, that you only need to configure each document type once (customised templates). The objective being that you can
 write any document in `markdown` completely without leaving your editor, and generate a `pdf` with a generic one-line command.
