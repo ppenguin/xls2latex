@@ -45,8 +45,12 @@ I used a `poetry` environment, so you could do the same to handle dependencies.
 # Broader Background
 ## Why?
 ### Reason
-If, like me, you replaced your documentation workflow to make e.g. letters, reports, quotations, etc. 
-from well-known office software to markdown, you may be faced with the challenge of including external tables.
+The main reason for developing this script is to get around the severe limitation of markdown tables in terms of 
+formatting and to automate inclusion of an effective workflow to author tables. (Let's face it, making tables is
+still by far the easiest using office-like software.)
+
+But, if, like me, you replaced your documentation workflow to make e.g. letters, reports, quotations, etc. 
+from well-known office software to markdown, you may be faced with the challenge of including these external tables.
 
 Since for this workflow my output format is still the "traditional" `pdf`, it makes sense to use `LaTeX` as an intermediate format.
 Enter [Pandoc](https://pandoc.org/).
