@@ -3,7 +3,7 @@ Python script to convert read tables from xls(x) files and output LaTeX tables.
 Based on [excel2latexviapython](https://github.com/michaelkirker/excel2latexviapython) by Michael Kirker.
 
 ## Status
-Te be considered **alpha** quality! It works for my use case but testing has been very limited, so YMMV.
+To be considered **alpha** quality! It works for my use case but testing has been very limited, so YMMV.
 Feel free to make improvements!
 
 ## Features
