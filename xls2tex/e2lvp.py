@@ -155,8 +155,11 @@ def _reformat_cellval(cell):
     if len(m) > 0:
         thsep = m[0] # is this true?
     
+    # the normal coding is like '[$-809]#,##0.00', where $ does not mean currency
+    # a coding with currency looks like '[$-809][$€]#,##0.00'
+    # so we only execute the currency part if we find two bracketed expressions...
     m = re.findall(r'\[(\$.?)', nff)
-    if len(m) > 0:
+    if len(m) > 1:
         curr = m[-1:][0]
         currsym = curr[-1:]  # either e.g. $€ or just $ (?)
     
