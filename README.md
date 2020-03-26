@@ -29,7 +29,7 @@ A more convenient use, however, is to use call the script from `LaTeX` by using 
 \input{|"xls2tex.py -f myfile.xlsx"}
 ```
 You can do this either from your `LaTeX` workflow or from your `pandoc` workflow. This requires activation 
-of shell command execution (off by default for secutiry reasons), in the `pandoc` case e.g.:
+of shell command execution (off by default for security reasons), in the `pandoc` case e.g.:
 
 ```
 pandoc --filter=pandoc-citeproc --filter=pandoc-crossref --filter=pandoc-xnos \
