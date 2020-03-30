@@ -1,0 +1,15 @@
+% Note: make sure \usepackage{booktabs} is included in the preamble 
+% Note: If your table contains colors, make sure \usepackage[table]{xcolor} is included in the preamble 
+\begin{longtable}{p{0.16\textwidth}>{\centering}p{0.16\textwidth}>{\raggedleft}p{0.16\textwidth}p{0.16\textwidth}} 
+\caption{Sheet1}\label{tbl:sheet1}\\ 
+\toprule 
+\textbf{H-One} 	 & 	 \multicolumn{2}{c}{\multirow{1}{*}{\textbf{H-TwoThree}}} 	 & 	 \textbf{H-Four} \\ 
+\midrule 
+\multicolumn{1}{l}{\multirow{3}{*}[-1.00ex]{\textbf{Pos1-3}}} 	 & 	 c2r2 	 & 	 c3r2 	 & 	 c4r2 \\ 
+  	 & 	 c2r3 	 & 	 c3r3 	 & 	 c4r3 \\ 
+  	 & 	 c2r4 	 & 	 c3r4 	 & 	 c4r4 \\ 
+\textbf{Pos4} 	 & 	 c2r5 	 & 	 c3r5 	 & 	 c4r5 \\ 
+\textbf{Pos5} 	 & 	 c2r6 	 & 	 c3r6 	 & 	 c4r6 \\ 
+\end{longtable} 
+
+

@@ -482,6 +482,75 @@ def _create_horzrule_code(row_tup, loc, merge_start_cols, merge_end_cols, usr_se
 
 def _get_merged_cells(sheet):
     """
+    rewrite of original making indexing easier and additionally enabling multirow
+    by ppenguin
+    """
+
+    start_row = []
+    start_col = []
+
+    end_row = []
+    end_col = []
+
+    latex_code = []
+
+    if len(sheet.merged_cell_ranges) == 0:
+        return [[], [], [], [], []]  # No merged cells, so return an empty list
+
+    for merge_ in sheet.merged_cell_ranges:  # For each merge in the sheet
+
+        # Split the location string of the merge, and convert it it to an index number (e.g. "A3")
+        # ppenguin: this fails on vertically merged cells, since merge_ is a CellRange object then
+        # so we need a generic function to get the appropriate coordinates
+        # merge_loc_str = re.split(':', merge_)
+        if type(merge_) == type(str):
+            ts = re.split(':', merge_)
+            start_coord = openpyxl.utils.coordinate_to_tuple(ts[0])
+            end_coord = openpyxl.utils.coordinate_to_tuple(ts[1])
+        else:
+            start_coord = (merge_.min_row, merge_.min_col)
+            end_coord = (merge_.max_row, merge_.max_col)
+            
+
+        start_row.append(start_coord[0] - 1)
+        start_col.append(start_coord[1] - 1)
+
+        end_row.append(end_coord[0] - 1)
+        end_col.append(end_coord[1] - 1)
+
+        ccell = sheet["%s%d"%(openpyxl.utils.cell.get_column_letter(start_coord[1]), start_coord[0])] 
+
+        value_string = ccell.value
+
+        if ccell.font.__dict__['b']:
+            value_string = "\\textbf{" + value_string + "}"
+
+        # Apply italicize if needed
+        if ccell.font.__dict__['i']:
+            value_string = "\\textit{" + value_string + "}"
+
+        # is it a vertical merge (multirow) or a horizontal one (multicol)?
+        # or both??? So why don't we just always define both multicol and multirow, but simply adjust the span,
+        # which would be 1 for both in case of a normal cell (which doesn't occur here becaus this code handles merges)
+        # Get span of multicolumn
+        colspan = end_coord[1] - start_coord[1] + 1
+        rowspan = end_coord[0] - start_coord[0] + 1
+        # Get alignment
+        halign = ccell.alignment.__dict__['horizontal'][0]  # get the first letter
+        # vertical alignment in multirow sucks, we need to tweak it with a so-called "fixup"
+        fixup = ""
+        if rowspan > 1:
+            fixup = "[-%0.2fex]"%((rowspan-1)/2+1)
+        # e.g. \multicolumn{3}{|l|}{\multirow{3}{*}{mystring}}
+        latex_code.append("\multicolumn{%d}{%s}{\multirow{%d}{*}%s{%s}}"%(colspan, halign, rowspan, fixup, value_string))
+        # latex_code.append('\multicolumn{' + str(colspan) + '}{' + halign + '}{' + value_string + '}')
+        ### TODO we need to handle borders here as well, and vertical alignment
+
+    return [start_row, start_col, end_row, end_col, latex_code]
+
+
+def _get_merged_cells_old(sheet):
+    """
     Locate all the merged cells within a sheet, return the row and column locations of the start and end, and also
     return the LaTeX code for the merged cells.
 
@@ -506,6 +575,8 @@ def _get_merged_cells(sheet):
     for merge_ in sheet.merged_cell_ranges:  # For each merge in the sheet
 
         # Split the location string of the merge, and convert it it to an index number (e.g. "A3")
+        # ppenguin: this fails on vertically merged cells, since merge_ is a CellRange object then
+        # so we need a generic function to get the appropriate coordinates
         merge_loc_str = re.split(':', merge_)
 
         # convert string to col/row index numbers

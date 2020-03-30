@@ -68,11 +68,11 @@ if __name__ == '__main__':
                       help="worksheet name (multiple times possible). If omitted, all worksheets are parsed.", action="append")
     parg.add_argument("-b", "--booktabs", dest="booktabs", type=bool, default=True, 
                       help="(True/False) Use the booktabs package functions to make prettier horizontal lines. Default: True.")
-    parg.add_argument("-t", "--tabular", dest="tabular", type=bool, default=True, 
+    parg.add_argument("-t", "--tabular", dest="tabular", type=bool, default=False, 
                       help="(True/False) Should the code include the tabular environment code around the table (\begin{tabular}, \end{tabular}), \
                           or just return the table rows.  Default: True." )
-    parg.add_argument("-l", "--longtable", dest="longtable", type=bool, 
-                      help="If specified, enclose output (per table) in \longtable environment")
+    parg.add_argument("-l", "--longtable", dest="longtable", type=bool, default=True,
+                      help="Enclose output (per table) in \longtable environment. Default: true")
     # parg.add_argument("-r", "--roundto", dest="roundto", type=int, 
     #                  help="--roundto (int) If specified, rounds all numbers in the table to the given number of decimal places")
     # parg.add_argument("--thsep", dest="thsep", type=str, default="'", 
