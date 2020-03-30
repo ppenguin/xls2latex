@@ -1,0 +1,35 @@
+%%% minimal pandoc latex template for testing purposes...
+
+\documentclass[plain]{article}
+
+\usepackage{longtable,booktabs}
+\usepackage{multirow}
+\usepackage{array} % necessary for table widths?
+% \usepackage[tableposition=top]{caption}
+\aboverulesep=0ex
+\belowrulesep=0ex
+% uncramp the table (due to the lost vertical space in cmidrule etc.
+\renewcommand{\arraystretch}{1.4} % choose this factor larger than 1.0 
+
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+
+\usepackage{graphicx}
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\usepackage{mathspec}
+
+\pagestyle{empty}
+
+\begin{document}
+
+$body$
+
+\end{document}

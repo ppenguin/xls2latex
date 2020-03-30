@@ -66,13 +66,13 @@ if __name__ == '__main__':
     parg.add_argument("-f", "--file", dest="filename", required=True, type=str, help="input file (xls(x))")
     parg.add_argument("-s", "--sheet", dest="sheets", type=str, 
                       help="worksheet name (multiple times possible). If omitted, all worksheets are parsed.", action="append")
-    parg.add_argument("-b", "--booktabs", dest="booktabs", type=bool, default=True, 
-                      help="(True/False) Use the booktabs package functions to make prettier horizontal lines. Default: True.")
-    parg.add_argument("-t", "--tabular", dest="tabular", type=bool, default=True, 
-                      help="(True/False) Should the code include the tabular environment code around the table (\begin{tabular}, \end{tabular}), \
-                          or just return the table rows.  Default: True." )
-    parg.add_argument("-l", "--longtable", dest="longtable", type=bool, 
-                      help="If specified, enclose output (per table) in \longtable environment")
+    # parg.add_argument("-b", "--booktabs", dest="booktabs", type=bool, default=True, 
+    #                   help="(True/False) Use the booktabs package functions to make prettier horizontal lines. Default: True.")
+    # parg.add_argument("-t", "--tabular", dest="tabular", type=bool, default=True, 
+    #                  help="(True/False) Should the code include the tabular environment code around the table (\begin{tabular}, \end{tabular}), \
+    #                      or just return the table rows.  Default: True." )
+    # parg.add_argument("-l", "--longtable", dest="longtable", type=bool, 
+    #                  help="If specified, enclose output (per table) in \longtable environment")
     # parg.add_argument("-r", "--roundto", dest="roundto", type=int, 
     #                  help="--roundto (int) If specified, rounds all numbers in the table to the given number of decimal places")
     # parg.add_argument("--thsep", dest="thsep", type=str, default="'", 
@@ -118,7 +118,7 @@ if __name__ == '__main__':
             if l is None and not optarg.nosheetcaption:
                 l = caption2label(c)
 
-            print(wb.getTeX(s, booktabs=optarg.booktabs, tabular=optarg.tabular, caption=c, label=l, longtable=optarg.longtable))
+            print(wb.getTeX(s, caption=c, label=l))
             print() # linefeed, on to the next table (if any)
     
         

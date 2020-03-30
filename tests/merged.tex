@@ -1,0 +1,24 @@
+% For vertical borders to work with booktabs, you **need** to put the following in the preamble:
+% \aboverulesep=0ex
+% \belowrulesep=0ex
+% uncramp the table (due to the lost vertical space in cmidrule etc.
+% \renewcommand{\arraystretch}{1.4} % choose this factor larger than 1.0 
+
+\begin{longtable}{llll} 
+\caption{Sheet1}\label{tbl:sheet1}\\ 
+\toprule
+\multicolumn{1}{c}{\textbf{H-One}} & \multicolumn{2}{c}{\textbf{H-TwoThree}} & \multicolumn{1}{c}{\textbf{H-Four}} \\ 
+\cmidrule{1-4}\morecmidrules\cmidrule{1-4} 
+\multicolumn{1}{c}{\multirow[c]{3}{*}[-2.14ex]{\textbf{Pos1-3}}} & \multicolumn{1}{l}{c2r2} & \multicolumn{1}{l}{c3r2} & \multicolumn{1}{r}{c4r2} \\ 
+\cmidrule{1-4} 
+\multicolumn{1}{l}{}  & \multicolumn{1}{l}{c2r3} & \multicolumn{1}{l}{c3r3} & \multicolumn{1}{r}{c4r3} \\ 
+\cmidrule{2-4} 
+\multicolumn{1}{l}{}  & \multicolumn{1}{l}{c2r4} & \multicolumn{1}{l}{c3r4} & \multicolumn{1}{r}{c4r4} \\ 
+\cmidrule{1-4} 
+\multicolumn{1}{c}{\textbf{Pos4}} & \multicolumn{1}{l}{c2r5} & \multicolumn{1}{l}{c3r5} & \multicolumn{1}{r}{c4r5} \\ 
+\cmidrule{1-4} 
+\multicolumn{1}{c}{\textbf{Pos5}} & \multicolumn{1}{l}{c2r6} & \multicolumn{1}{l}{c3r6} & \multicolumn{1}{r}{c4r6} \\ 
+\bottomrule 
+\end{longtable} 
+
+

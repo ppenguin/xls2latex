@@ -8,7 +8,8 @@ Created on Mon Mar 23 12:47:40 2020
 
 import openpyxl
 from itertools import compress
-from . import e2lvp
+# from . import e2lvp
+from . import xlTableTeX
 
 
 class xlWorkbookTeX(openpyxl.Workbook):
@@ -24,8 +25,15 @@ class xlWorkbookTeX(openpyxl.Workbook):
         self._sheets = wb._sheets
                
 
+    def getTeX(self, sheetname, textcharwidth=80, caption=None, label=None):
+        
+        xt = xlTableTeX.xlTableTeX(self[sheetname])
+        xt.genTex(textcharwidth, caption, label)
+               
+        return xt.texout
 
-    def getTeX(self, sheetname, booktabs=True, tabular=True, longtable=True, caption=None, label=None):
+
+    def getTeX_old(self, sheetname, booktabs=True, tabular=True, longtable=True, caption=None, label=None):
         
         usr_settings={'booktabs': booktabs, 'includetabular': tabular}
         #if roundto is None:
