@@ -11,7 +11,7 @@ Outputs valid `LaTeX` code for tables from `Excel/LibreOffice` workbooks (one ta
 honoring the following properties in the worksheet:
  - colours (untested)
  - number format
- - alignment (only based on the alignment of the cells in the header row for now)
+ - alignment (even for individual cells!)
  - borders.
 
 Additionally, for multi-line cells needing wrapped text, you can now set the column widths on the 
