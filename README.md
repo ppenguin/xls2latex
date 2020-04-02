@@ -7,7 +7,7 @@ To be considered **alpha** quality! It works for my use case but testing has bee
 Feel free to make improvements!
 
 ## Features
-Outputs valid $LaTeX$ code for tables from `Excel/LibreOffice` workbooks (one table per worksheet) while
+Outputs valid `LaTeX` code for tables from `Excel/LibreOffice` workbooks (one table per worksheet) while
 honoring the following properties in the worksheet:
  - colours (untested)
  - number format
@@ -19,7 +19,7 @@ command line (since `openpyxl` seems to incorrectly report column widths).
 
 ## Prerequisites
 
-Needs (at least) the following $LaTeX$ packages:
+Needs (at least) the following `LaTeX` packages:
 - `longtable`
 - `array`
 - `xcolor`
