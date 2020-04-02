@@ -7,12 +7,25 @@ To be considered **alpha** quality! It works for my use case but testing has bee
 Feel free to make improvements!
 
 ## Features
-Outputs valid `LaTeX` code for tables from `Excel/LibreOffice` workbooks (one table per worksheet) while
-honoring the following properties in the woksheet:
+Outputs valid $LaTeX$ code for tables from `Excel/LibreOffice` workbooks (one table per worksheet) while
+honoring the following properties in the worksheet:
  - colours (untested)
  - number format
  - alignment (only based on the alignment of the cells in the header row for now)
  - borders.
+
+Additionally, for multi-line cells needing wrapped text, you can now set the column widths on the 
+command line (since `openpyxl` seems to incorrectly report column widths).
+
+## Prerequisites
+
+Needs (at least) the following $LaTeX$ packages:
+- `longtable`
+- `array`
+- `xcolor`
+- `caption`
+- `multirow`
+- `multicolumn`
 
 ## Usage
 You can use `xls2tex.py` stand alone to read `myfile.xlsx` and pipe the output to `mytable.tex` for inclusion 
