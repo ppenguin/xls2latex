@@ -10,13 +10,23 @@ from . import xlcellfun
 
 class xlTableTeX(object):
     
-    def __init__(self, worksheet):
+    def __init__(self, worksheet, textcharwidth=80, caption=None, label=None, colwidths=None, vfix=None, smalltext=False):
         
         self.sheet = worksheet
         self.minco = (self.sheet.min_row, self.sheet.min_column)
         self.maxco = (self.sheet.max_row, self.sheet.max_column)
         self.numcols = self.sheet.max_column - self.sheet.min_column + 1
         self.numrows = self.sheet.max_row - self.sheet.min_row + 1
+        self.textcharwidth = textcharwidth
+        self.caption = caption
+        self.label = label
+        self.setcolwidths(colwidths)
+        self.vfix = vfix
+        self.smalltext = smalltext
+        # difference between paragraph and normal columns https://www.overleaf.com/learn/latex/tables
+        self.pvalignmap = {None: 'p', 'bottom': 'b', 'center': 'm', 'distributed': 'm', 'justify': 'm', 'top': 'p'}
+        self.phalignmap = {None: '\\raggedright', 'left': '\\raggedright', 'centerContinuous': '\\centering', 'center': '\\centering', 'distributed': '\\centering', 'fill': '\\centering', 'justify': '\\centering', 'right': '\\raggedleft', 'general': '\\raggedright'}
+        self.halignmap = {None: 'l', 'left': 'l', 'centerContinuous': 'c', 'center': 'c', 'distributed': 'c', 'fill': 'c', 'justify': 'c', 'right': 'r', 'general': 'l'}
         self.setdmergedrngs()
         self.tbody = ""
         self.texout = ""
@@ -56,6 +66,19 @@ class xlTableTeX(object):
                 return ret
         
         return ret
+    
+    
+    # check whether te cell with coordinates (r,c) is in a vertically merged range (except last row)
+    def invmerged(self, r, c):
+        # the check range is the current coordinate (1 cell)
+        cr = openpyxl.worksheet.cell_range.CellRange(min_col=c, min_row=r, max_col=c, max_row=r)
+        ret = False
+        for mr in self.sheet.merged_cells.ranges:
+            if cr.issubset(mr): # we have found the merged range of which the current (c,r) is a part
+                if mr.max_row > mr.min_row: # vertical range
+                    return (r >= mr.min_row and r < mr.max_row)  # we are in mr, except bottom
+                
+        return ret        
 
     
     def getcellhalign(self, c):
@@ -88,7 +111,13 @@ class xlTableTeX(object):
         ss = None
         ruledef = ""
         for c in range(self.minco[1], self.maxco[1] + 1):
-            style = self.sheet._cells[(r, c)].border.bottom.style
+            if (r, c) in self.sheet._cells.keys():
+                style = self.sheet._cells[(r, c)].border.bottom.style
+                # we have to ignore the bottom border if we are in a rowspan, unless at the bottom
+                if self.invmerged(r, c):
+                    style = None
+            else:
+                style = None
             if currstyle != style or ss == None or c == self.maxco[1]: # we have a style change or we just started or are at the end
                 if ss is not None: # flush the current style to the cmidruledef
                     if currstyle == 'double':
@@ -107,10 +136,70 @@ class xlTableTeX(object):
         if oc.font.i:
             tex = "\\textit{%s}"%tex
         return tex
-            
+        
+    
+    def setcolwidths(self, s):
+        l = []
+        if s is not None and len(s) > 0:
+            for p in s.split(","):
+                try:
+                    f = float(p)
+                    l.append("{%0.2f\\textwidth}"%f)
+                except:
+                    l.append("{%s}"%p)
+        self.colwidths = l
+
+                
+    # get a complete string e.g. for a table definition
+    # self-specified list of aligns not yet implemented
+    #def getcolwidthsstr(self, lhalign=None, lvalign=None): 
+    #    #if len(lalign) <> len(self.colwidths):
+    #    l = []
+    #    for s in self.colwidths:
+    #        # s has a value of the form {0.3\textwidth}
+    #       # including align this has to be >{\centering}p{0.3\textwidth}
+    #        if self.colwidths.index(s) <= len(lhalign): # get info for this col
+    #            
+    #    return "".join(l)
         
 
-    def genTex(self, width=80, caption=None, label=None):
+    # https://stackoverflow.com/questions/1110961/how-can-i-restrict-the-size-of-my-multicolumn-cells-in-a-longtable
+    # get a complete multicolumn format string with column width, alignment and borders
+    def getmcformatstr(self, c=None, al=None, bo=None, colcount=1):
+
+        # this is the 1-based column number, if not given we cannot get column defaults and return the simple representation
+        # if we have a colspan, ignpre column widths specified and return simple representation
+        if c is None or len(self.colwidths) == 0 or c > len(self.colwidths) or colcount > 1:
+            if al is not None:
+                alstr = self.halignmap[al.horizontal]
+            else:
+                alstr = 'l'
+            if bo is not None:
+                ret = self.getbordersym(bo.left) + alstr + self.getbordersym(bo.right)
+            
+            return ret
+        
+        # if we come here, we have a column number and column width info
+        if al is not None:
+            halstr = ">{%s}"%self.phalignmap[al.horizontal]
+            valstr = self.pvalignmap[al.vertical]
+        else:
+            halstr = ">{\\raggedright}"
+            valstr = "p"
+            
+        if bo is not None:
+            lb = self.getbordersym(bo.left)
+            rb = self.getbordersym(bo.right)
+        else:
+            lb = ''
+            rb = ''
+        
+        ret = halstr + lb + valstr + rb + self.colwidths[c-1]
+        
+        return ret
+        
+
+    def genTex(self, width=80, caption=None, label=None, colwidths=None, vfix=None):
         
         # always use multicol and multirow for flexibility reasons
         
@@ -122,6 +211,7 @@ class xlTableTeX(object):
         tbody = "\\toprule\n"
         endrowspan = {}
         inrowspan = {}
+        
         for ro in range(self.minco[0], self.maxco[0] + 1):
             endcolspan = 0
             incolspan = False
@@ -148,26 +238,34 @@ class xlTableTeX(object):
                 mctext = ""
                 mrtext = ""
                 celltext = ""
-                ocell = self.sheet._cells[(ro, co)]
-                cval = xlcellfun.reformat_cellval(ocell)
-                cval = self.applytexformat(cval, ocell)
+                # if we are still in the table range, it is possible that there are undefined cells
+                # so we check for them and make an empty cell if there is no definition
+                if (ro, co) in self.sheet._cells.keys():
+                    ocell = self.sheet._cells[(ro, co)]
+                    cval = xlcellfun.reformat_cellval(ocell)
+                    cval = self.applytexformat(cval, ocell)
+                    al = ocell.alignment
+                    bo = ocell.border
+                else:   # define some defaults so we can execute the normal code
+                    ocell = None
+                    cval = ""
+                    al = None
+                    bo = None
+                      
                 # if we are within a merged cell, but not at the start, we skip the content
                 if rs > 1:  # we are at the start of a merged row
-                    valign = self.getcellvalign(ocell)
-                    vmove = "%0.2fex"%(-rs/1.4)
+                    valign = self.getcellvalign(ocell) if ocell is not None else valign
+                    vmove = "%0.2fex"%(-rs/2.0) if vfix is None else vfix
                     mrtext = "\\multirow[%s]{%d}{*}[%s]"%(valign, rs, vmove)
                 
-                # get some cell layout info
-                halign = self.getcellhalign(ocell)                  
-                lb = self.getbordersym(ocell.border.left)
-                rb = self.getbordersym(ocell.border.right)
-                
+                # For every multicolumn, if we specify a fixed width for the column in the table env,
+                # we also **must** specify it for the cell, otherwise it's ignored...
                 if cs > 1 or rs > 1 or (not inrowspan[co] and not incolspan): # start of colspan or a normal cell (we still use a multicol for easier alignment and borders)
-                    mctext += "\\multicolumn{%d}{%s%s%s}{"%(cs, lb, halign, rb)
+                    mctext += "\\multicolumn{%d}{%s}{"%(cs, self.getmcformatstr(co, al, bo, colcount=cs))
                 elif inrowspan[co] and not incolspan: # here we need an empty cell
                     mrtext = " "
                     # actually we need an empty cell with a border, so:
-                    mctext += "\\multicolumn{%d}{%s%s%s}{}"%(cs, lb, halign, rb)
+                    mctext += "\\multicolumn{%d}{%s}{}"%(cs, self.getmcformatstr(co, al, bo))
                 
                 # multicolumn needs to go before multirow (apparently, otherwise errors)
                 if len(mctext)>0:
@@ -178,7 +276,7 @@ class xlTableTeX(object):
 
                 celltext = mctext + mrtext
 
-                if len(celltext) > 0 and co < self.maxco[1]:
+                if len(celltext) > 0 and co < self.maxco[1] and not incolspan:  # the last condition is for colspans that are full-width
                     celltext += " & "
 
                 if co == self.maxco[1]:
@@ -198,17 +296,27 @@ class xlTableTeX(object):
 % \\belowrulesep=0ex
 % uncramp the table (due to the lost vertical space in cmidrule etc.
 % \\renewcommand{\\arraystretch}{1.4} % choose this factor larger than 1.0 \n\n"""
-                     
-        tenvbeg = "\\begin{longtable}{%s} \n"%("l"*self.numcols)
+        
+        if self.smalltext:
+            smallbeg = "{\small\\tabcolsep=3.5pt  % hold it local \n"
+            smallend = "}% small text \n"
+        else:
+            smallbeg = ""
+            smallend = ""
+
+        # if colwidths is None:          
+        tenvbeg = "\\begin{longtable}{%s} \n"%("l"*self.numcols)  
+        # else: 
+        #    tenvbeg = "\\begin{longtable}{%s} \n"%(self.getcolwidthsstr(colwidths)) # this is not sufficient if all cells are multicolumn! It has to be specified per cell!
         tenvend = "\\bottomrule \n\\end{longtable} \n"
         
         caplab = ""
-        if caption is not None:
-            caplab += "\\caption{%s}"%caption
-        if label is not None:
-            caplab += "\\label{%s}"%label
+        if self.caption is not None:
+            caplab += "\\caption{%s}"%self.caption
+        if self.label is not None:
+            caplab += "\\label{%s}"%self.label
         if len(caplab) > 0:
             caplab += "\\\\ \n"
         
-        self.texout = comment + tenvbeg + caplab + tbody + tenvend
+        self.texout = comment + smallbeg + tenvbeg + caplab + tbody + tenvend + smallend
         

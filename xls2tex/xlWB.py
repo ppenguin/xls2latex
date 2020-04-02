@@ -25,10 +25,10 @@ class xlWorkbookTeX(openpyxl.Workbook):
         self._sheets = wb._sheets
                
 
-    def getTeX(self, sheetname, textcharwidth=80, caption=None, label=None):
+    def getTeX(self, sheetname, textcharwidth=80, caption=None, label=None, colwidths=None, vfix=None, smalltext=False):
         
-        xt = xlTableTeX.xlTableTeX(self[sheetname])
-        xt.genTex(textcharwidth, caption, label)
+        xt = xlTableTeX.xlTableTeX(self[sheetname], textcharwidth, caption, label, colwidths, vfix, smalltext)
+        xt.genTex()
                
         return xt.texout
 

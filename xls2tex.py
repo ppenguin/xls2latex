@@ -81,14 +81,19 @@ if __name__ == '__main__':
                       help="If specified, include a table caption. Implies --longtable=True")
     parg.add_argument("--label", dest="label", type=str, 
                       help="--label=labeltext: Includes a \label{tabletext} with the caption. Only has an effect if --caption is defined.")
+    parg.add_argument("-w", "--widths", dest="colwidths", type=str, default=None, 
+                      help="--widths=n.n[em|cm],...  Comma separated list with column widths specified in valid LaTeX units, or a fraction of the textwidth if unit is omitted.")
+    parg.add_argument("--vfix", dest="vfix", type=str, default=None, 
+                      help="--vfix=n.n[ex,cm] indicates the correction in LaTeX units to shift the content of vertically merged cells. If omitted defaults to -#mergedrows/2.0[ex]")
     parg.add_argument("--nosheetcaption", dest="nosheetcaption", default=False, action='store_true',
                       help="Do not use the worksheet name as the caption name when no explicit caption is given. The effect is no caption.")
     parg.add_argument("-e", "--with-stderr", dest="withstderr", default=False, action='store_true',
                       help="Use an internal redirect 2>&1 instead of the default 2>/dev/null.")
+    parg.add_argument("--small", dest="smalltext", default=False, action='store_true', help="Use smaller text in the table")
 
     optarg = parg.parse_args()
     # automatically exits on error, so we have the required arguments when we arrive here
-    
+    # print(vars())
     # the LaTeX pipe bombs on stderr (apparently), even if we don't output stuff to stderr
     # so redirect, unless user wants debug output in the final document (sensitive to invalid LaTeX characters!)
     # fd = os.open('/dev/null', os.O_WRONLY)
@@ -118,7 +123,7 @@ if __name__ == '__main__':
             if l is None and not optarg.nosheetcaption:
                 l = caption2label(c)
 
-            print(wb.getTeX(s, caption=c, label=l))
+            print(wb.getTeX(s, caption=c, label=l, colwidths=optarg.colwidths, vfix=optarg.vfix, smalltext=optarg.smalltext))
             print() # linefeed, on to the next table (if any)
     
         
