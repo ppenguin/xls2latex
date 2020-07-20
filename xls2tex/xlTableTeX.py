@@ -169,6 +169,8 @@ class xlTableTeX(object):
 
         # this is the 1-based column number, if not given we cannot get column defaults and return the simple representation
         # if we have a colspan, ignpre column widths specified and return simple representation
+        ret = ''
+
         if c is None or len(self.colwidths) == 0 or c > len(self.colwidths) or colcount > 1:
             if al is not None:
                 alstr = self.halignmap[al.horizontal]
@@ -176,6 +178,8 @@ class xlTableTeX(object):
                 alstr = 'l'
             if bo is not None:
                 ret = self.getbordersym(bo.left) + alstr + self.getbordersym(bo.right)
+            else:
+                ret = alstr
             
             return ret
         
