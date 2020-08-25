@@ -149,6 +149,10 @@ class xlTableTeX(object):
                     l.append("{%s}"%p)
         self.colwidths = l
 
+    def texescape(self, s):
+        # for now escape all % with \
+        # (other escapes here too?)
+        return s.replace(r"%", r"\%")
                 
     # get a complete string e.g. for a table definition
     # self-specified list of aligns not yet implemented
@@ -291,7 +295,7 @@ class xlTableTeX(object):
                         if len(cmr) > 0:
                             celltext += cmr + " \n"
                 
-                tbody += celltext
+                tbody += self.texescape(celltext)
         
             
         # define the environment (for now whe just choose default left alignment, since we specifically align each cell with multicol)
