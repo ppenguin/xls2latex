@@ -19,34 +19,17 @@
       poetry2nix.overlay
       (final: prev: {
 
-        xls2latex = prev.poetry2nix.mkPoetryApplication {
-          projectDir = ./.;
-          # overrides = [ prev.poetry2nix.defaultPoetryOverrides ];
-          meta = with nixpkgs.lib; {
-            description = "Converts xls(x) worksheets to LaTeX tables (best used with pandoc(omatic))";
-            longDescription = ''
-              Xls2latex is a python program that can be used to include tables from xls(x) worksheet in LaTeX documents.
-              It can be used transparently in (e.g.) pandoc md-to-latex-to-pdf workflows.
-            '';
-            homepage = "https://github.com/ppenguin/xls2latex";
-            license = licenses.agpl3Plus;
-            maintainers = with maintainers; [ ppenguin ];
-            platforms = platforms.all;
-          };
-        };
+        xls2latex = import ./default.nix { pkgs = prev; };
 
         xls2latex-devenv = prev.poetry2nix.mkPoetryEnv {
           projectDir = ./.;
-          overrides =
-            [ prev.poetry2nix.defaultPoetryOverrides ];
+          # overrides = [ prev.poetry2nix.defaultPoetryOverrides ];
         };
 
       })
     ];
   } // flake-utils.lib.eachDefaultSystem (system:
       let
-        # nixpkgs.overlays = [ self.overlay ];
-        # pkgs = nixpkgs.legacyPackages.${system};
         pkgs = import nixpkgs { inherit system; overlays = [ self.overlay ];};
         packageName = "xls2latex";
       in {
