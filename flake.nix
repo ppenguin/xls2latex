@@ -4,7 +4,7 @@
   description = "xls2latex converts xls(x) worksheets to LaTeX tables (best used with pandoc(omatic))";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -34,7 +34,7 @@
             poetry
             (pkgs.python3.withPackages (p: with p; [ pylint ]))
           ];
-          # inputsFrom = builtins.attrValues self.packages.${system};
+          inputsFrom = builtins.attrValues self.packages.${system};
         };
       });
 }

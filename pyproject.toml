@@ -4,6 +4,9 @@ version = "0.1.0"
 description = ""
 authors = ["Your Name <you@example.com>"]
 
+[tool.poetry.scripts]
+xls2latex = "xls2latex.main:main"
+
 [tool.poetry.dependencies]
 python = "^3.8"
 openpyxl = "^3.0.3"
