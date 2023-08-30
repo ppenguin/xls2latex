@@ -43,30 +43,30 @@ def _moneyfmt(value, places=2, curr='', sep=',', dp='.',
     result = []
     digits = list(map(str, digits))
     build, next = result.append, digits.pop
-    
+
     if sign:
         build(trailneg)
-    
+
     for i in range(places):
         build(next() if digits else '0')
-    
+
     if places:
         build(dp)
-    
+
     if not digits:
         build('0')
     i = 0
-    
+
     while digits:
         build(next())
         i += 1
         if i == 3 and digits:
             i = 0
             build(sep)
-    
+
     build(curr)
     build(neg if sign else pos)
-    
+
     return ''.join(reversed(result))
 
 
@@ -130,30 +130,30 @@ def _clean_cell_str(s):
 
 
 def reformat_cellval(cell):
-    # Reformat a number of the form 
+    # Reformat a number of the form
     # [$-NNCCLLLL]#,##0.00 (see also https://help.libreoffice.org/Common/Number_Format_Codes)
     # We ignore the (Extended) LCID for now
     # Surprised there is no Pandas function for this? Not searched well enough?
-    
+
     if cell.value is None:
         return ""
-    
+
     try:
         cval = float(cell.value)
     except:
         return cell.value  # if not a number then return
-    
+
     thsep = ''
     currsym = ''
     # lcid = ''
     decsep = '.'
     decp = ''
-    
+
     nf = cell.number_format
-    
+
     nff = nf.split(';')[0] # handle only first fragment, e.g. if separate fragments for negatives
                            # TODO: in fact we should use this for colouring too, but this requires major refactoring...
-    
+
     # check for scientific format
     m = re.findall(r'(\d*)\.(\d*)[Ee]\+(\d*)', nff)
     if len(m) > 0:
@@ -162,11 +162,11 @@ def reformat_cellval(cell):
         # ep = len(m[0][2]) # apparently not supported in normal exp notation
         fmt = '{:.%sE}'%dp
         return fmt.format(cval)
-    
+
     m = re.findall(r'#\\?(.?)#', nff) # is this robust? Apparently if thsep == ' it may be escaped...
     if len(m) > 0:
         thsep = m[0] # is this true?
-    
+
     # the normal coding is like '[$-809]#,##0.00', where $ does not mean currency
     # a coding with currency looks like '[$-809][$€]#,##0.00'
     # so we only execute the currency part if we find two bracketed expressions...
@@ -174,26 +174,26 @@ def reformat_cellval(cell):
     if len(m) > 1:
         curr = m[-1:][0]
         currsym = curr[-1:]  # either e.g. $€ or just $ (?)
-    
+
     # m = re.findall('\[\$.?-([0-F]*)\]', nff) # we currently don't use this
     # if len(m) > 0:
     #    lcid = m[0]
-    
+
     m = re.findall(r'.?[0-9]?([,.\s]{1})([0-9]*)', nff)
     if len(m) > 0:
         decsep, decp = m[-1:][0]
-    
+
     numdec = len(decp)
-    
+
     # a sanity check (force different thsep and decsep):
     if thsep == decsep:
         if thsep != '.':
             decsep = '.'
         else:
             decsep = ','
-    
+
     # now combine everything
     ret = _moneyfmt(Decimal(cval), numdec, currsym, thsep, decsep)
-    
+
     return ret
 

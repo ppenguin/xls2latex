@@ -3,7 +3,7 @@
 __version__ = '0.3.0'
 
 """
-xls2tex
+xls2latex
 Created on Mon Mar 23 12:47:40 2020
 @author: ppenguin
 
@@ -16,7 +16,7 @@ Tested in a pandoc environment with the following:
 
 testdoc.md:
     ...
-    \input{|"xls2tex -f myfile.xlsx"}
+    \input{|"xls2latex -f myfile.xlsx"}
     ...
 
 pandoc command:
@@ -33,7 +33,10 @@ TODO:
 from argparse import ArgumentParser
 import re
 import os
-from xls2tex.xlWB import xlWorkbookTeX
+if __package__ is not None:
+    from xls2latex.xlWB import xlWorkbookTeX
+else:
+    from xlWB import xlWorkbookTeX
 
 
 # match multiple arguments to the sheet argument in order of occurence, or return empty if #sheets > #argame
@@ -59,11 +62,10 @@ def caption2label(caption):
     return 'tbl:' + re.sub('[^\w\-]','',caption.strip().replace(' ','-')).lower()
 
 
-if __name__ == '__main__':
-
+def main():
     parg = ArgumentParser(description="Reads a given xls(x) file and outputs the contents of its worksheets as LaTeX tables. \n \
                           Designed for use in automated workflows for LaTeX processing, e.g. like so: \n \
-                              \\input{|\"xls2tex -f myfile.xlsx\"}",
+                              \\input{|\"xls2latex -f myfile.xlsx\"}",
                           epilog="Since in LaTeX shell escaping becomes difficult, best is to avoid arguments with spaces or enclose in single quotes (') if called from LaTeX.")
     parg.add_argument("-f", "--file", dest="filename", required=True, type=str, help="input file (xls(x))")
     parg.add_argument("-s", "--sheet", dest="sheets", type=str,
@@ -128,5 +130,12 @@ if __name__ == '__main__':
             print(wb.getTeX(s, caption=c, label=l, colwidths=optarg.colwidths, vfix=optarg.vfix, smalltext=optarg.smalltext))
             print() # linefeed, on to the next table (if any)
 
+print(f"{__package__} {__name__}")
 
-
+if __name__ == "__main__" and __package__ is None:
+    # Make the script executable
+    sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+    import main
+    main.main()
+else:
+    main()

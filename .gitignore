@@ -4,5 +4,6 @@ __pycache__
 
 .direnv/
 .venv/
+.pytest*/
 dist/
 result

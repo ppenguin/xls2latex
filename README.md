@@ -28,18 +28,18 @@ Needs (at least) the following `LaTeX` packages:
 - `multicolumn`
 
 ## Usage
-You can use `xls2tex.py` stand alone to read `myfile.xlsx` and pipe the output to `mytable.tex` for inclusion 
+You can use `xls2latex.py` stand alone to read `myfile.xlsx` and pipe the output to `mytable.tex` for inclusion 
 in a `LaTeX` document.
 
 ```
-/path/to/xls2tex.py -f myfile.xlsx > mytable.tex
+/path/to/xls2latex.py -f myfile.xlsx > mytable.tex
 ```
-Get the possible command line options by executing without arguments `xls2tex.py`.
+Get the possible command line options by executing without arguments `xls2latex.py`.
 
 A more convenient use, however, is to use call the script from `LaTeX` by using piped input:
 
 ```
-\input{|"xls2tex.py -f myfile.xlsx"}
+\input{|"xls2latex.py -f myfile.xlsx"}
 ```
 You can do this either from your `LaTeX` workflow or from your `pandoc` workflow. This requires activation 
 of shell command execution (off by default for security reasons), in the `pandoc` case e.g.:

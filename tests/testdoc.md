@@ -14,9 +14,9 @@ Pos.      Description                    Unit price   Qty          Total
 
 Tables obtained by including here:
 
-```\input{|"python ../xls2tex.py -f prices.xlsx"}```
+```\input{|"python ../xls2latex.py -f prices.xlsx"}```
 
-\input{|"python ../xls2tex.py -f prices.xlsx"}
+\input{|"python ../xls2latex.py -f prices.xlsx"}
 
 That seems to work, can we also refer to this table (with caption)? Refer to [@tbl:quotation-price].
 
@@ -33,9 +33,9 @@ But: apparently the number format from the `Excel` tables is not honored if the 
 
 A more refined usage like so:
 
-```\input{|"python ../xls2tex.py -f prices.xlsx -s 'Quotation Price' --label=tbl:qp2"}```
+```\input{|"python ../xls2latex.py -f prices.xlsx -s 'Quotation Price' --label=tbl:qp2"}```
 
-\input{|"python ../xls2tex.py -f prices.xlsx -s 'Quotation Price' --label=tbl:qp2"}
+\input{|"python ../xls2latex.py -f prices.xlsx -s 'Quotation Price' --label=tbl:qp2"}
 
 Refer to [@tbl:qp2], which we already have once, maybe trouble, or not, if we specify the label!
 

@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-python ../xls2tex.py -f merged.xlsx -e > merged.tex
+python ../xls2latex.py -f merged.xlsx -e > merged.tex
 
 pandoc --filter=pandoc-xnos --filter=pandoc-crossref  \
     --template=pandoc_template_min.latex --pdf-engine=xelatex --pdf-engine-opt=-shell-escape --verbose \
