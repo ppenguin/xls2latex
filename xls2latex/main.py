@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 
 """
 xls2latex
@@ -130,12 +130,13 @@ def main():
             print(wb.getTeX(s, caption=c, label=l, colwidths=optarg.colwidths, vfix=optarg.vfix, smalltext=optarg.smalltext))
             print() # linefeed, on to the next table (if any)
 
-print(f"{__package__} {__name__}")
 
-if __name__ == "__main__" and __package__ is None:
-    # Make the script executable
-    sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-    import main
-    main.main()
-else:
+# FIXME: (How???) not able to make imports work for both `poetry run xls2latex`` and `python xls2latex/main.py`
+# if __name__ == "__main__" and __package__ is None:
+#     # Make the script executable
+#     sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+#     import main
+#     main.main()
+# else:
+if __name__ == "__main__":
     main()
