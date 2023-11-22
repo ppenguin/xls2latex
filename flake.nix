@@ -18,12 +18,11 @@
         inherit (poetry2nix.lib.mkPoetry2Nix { inherit pkgs; }) mkPoetryApplication;
         xls2latex = pkgs.callPackage ./default.nix { inherit mkPoetryApplication; };# mkPoetryApplication { projectDir = self; };
       in
+
       {
-        overlays = [
-          (final: prev: {
-            inherit xls2latex;
-          })
-        ];
+        overlays.default = final: prev: {
+          inherit xls2latex;
+        };
 
         packages = rec {
           # xls2latex = pkgs.callPackage ./default.nix { inherit mkPoetryApplication; inherit (pkgs) lib; };# mkPoetryApplication { projectDir = self; };
