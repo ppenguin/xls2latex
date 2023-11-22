@@ -20,5 +20,5 @@ openpyxl = "^3.1"
 pytest = "^7.4"
 
 [build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
