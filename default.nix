@@ -1,9 +1,13 @@
-{ pkgs ? import <nixpkgs> { } }:
+{
+  lib
+  , mkPoetryApplication
+  , python3
+}:
 
-pkgs.poetry2nix.mkPoetryApplication {
+mkPoetryApplication {
   projectDir = ./.;
-  python = pkgs.python3;
-  meta = with pkgs.lib; {
+  python = python3;
+  meta = with lib; {
     description = "Converts xls(x) worksheets to LaTeX tables (best used with pandoc(omatic))";
     longDescription = ''
       Xls2latex is a python program that can be used to include tables from xls(x) worksheet in LaTeX documents.

@@ -16,15 +16,23 @@
         # see https://github.com/nix-community/poetry2nix/tree/master#api for more functions and examples.
         pkgs = nixpkgs.legacyPackages.${system};
         inherit (poetry2nix.lib.mkPoetry2Nix { inherit pkgs; }) mkPoetryApplication;
+        xls2latex = pkgs.callPackage ./default.nix { inherit mkPoetryApplication; };# mkPoetryApplication { projectDir = self; };
       in
       {
-        packages = {
-          xls2latex = mkPoetryApplication { projectDir = self; };
-          default = self.packages.${system}.xls2latex;
+        overlays = [
+          (final: prev: {
+            inherit xls2latex;
+          })
+        ];
+
+        packages = rec {
+          # xls2latex = pkgs.callPackage ./default.nix { inherit mkPoetryApplication; inherit (pkgs) lib; };# mkPoetryApplication { projectDir = self; };
+          inherit xls2latex;
+          default = /* self.packages. */xls2latex;
         };
 
         devShells.default = pkgs.mkShell {
-          inputsFrom = [ self.packages.${system}.xls2latex ];
+          inputsFrom = [ xls2latex ];
           packages = [ pkgs.poetry ];
         };
       });
