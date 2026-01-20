@@ -28,6 +28,7 @@
   };
 
   outputs = {
+    self,
     nixpkgs,
     pyproject-nix,
     uv2nix,
@@ -64,7 +65,8 @@
     );
   in {
     packages = forAllSystems (system: {
-      default = pythonSets.${system}.mkVirtualEnv "xls2latex-env" workspace.deps.default;
+      xls2latex = pythonSets.${system}.mkVirtualEnv "xls2latex-env" workspace.deps.default;
+      default = self.packages.${system}.xls2latex;
     });
   };
 }
