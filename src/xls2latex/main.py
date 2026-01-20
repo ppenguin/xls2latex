@@ -1,10 +1,10 @@
-#! /usr/bin/env python
+__version__ = "0.5.0"
 
-__version__ = '0.4.0'
-
-"""
+r"""
 xls2latex
-Created on Mon Mar 23 12:47:40 2020
+Created: Mon Mar 23 12:47:40 2020
+Updated: Jan 2026
+
 @author: ppenguin
 
 Based on https://github.com/michaelkirker/excel2latexviapython by Michael Kirker
@@ -33,10 +33,7 @@ TODO:
 from argparse import ArgumentParser
 import re
 import os
-if __package__ is not None:
-    from xls2latex.xlWB import xlWorkbookTeX
-else:
-    from xlWB import xlWorkbookTeX
+from .xlWB import xlWorkbookTeX
 
 
 # match multiple arguments to the sheet argument in order of occurence, or return empty if #sheets > #argame
@@ -44,8 +41,10 @@ def matchSheetOpt(argns, sheetname, argname):
     try:
         ret = argns[argname][argns.sheets.index(sheetname)]
     except:
-        ret = vars(argns)[argname]   # if specified only once even with more sheets, just always take the specified value.
-                                     # This can lead to multiple occurences of a caption or label!!!
+        ret = vars(argns)[
+            argname
+        ]  # if specified only once even with more sheets, just always take the specified value.
+        # This can lead to multiple occurences of a caption or label!!!
     return ret
 
 
@@ -59,17 +58,38 @@ def harmoniseOpt(argns):
 
 
 def caption2label(caption):
-    return 'tbl:' + re.sub('[^\w\-]','',caption.strip().replace(' ','-')).lower()
+    return "tbl:" + re.sub(r"[^\w\-]", "", caption.strip().replace(" ", "-")).lower()
 
 
 def main():
-    parg = ArgumentParser(description="Reads a given xls(x) file and outputs the contents of its worksheets as LaTeX tables. \n \
-                          Designed for use in automated workflows for LaTeX processing, e.g. like so: \n \
-                              \\input{|\"xls2latex -f myfile.xlsx\"}",
-                          epilog="Since in LaTeX shell escaping becomes difficult, best is to avoid arguments with spaces or enclose in single quotes (') if called from LaTeX.")
-    parg.add_argument("-f", "--file", dest="filename", required=True, type=str, help="input file (xls(x))")
-    parg.add_argument("-s", "--sheet", dest="sheets", type=str,
-                      help="worksheet name (multiple times possible). If omitted, all worksheets are parsed.", action="append")
+    parg = ArgumentParser(
+        description="""
+            Reads a given xls(x) file and outputs the contents of its worksheets as LaTeX tables.
+            Designed for use in automated workflows for LaTeX processing, e.g. like so:
+                 \\input{|"xls2latex -f myfile.xlsx"}
+            """,
+        epilog="""
+            Since in LaTeX shell escaping becomes difficult, best is to avoid arguments with spaces
+            or enclose in single quotes (') if called from LaTeX.
+        """,
+    )
+    _ = parg.add_argument(
+        "-f",
+        "--file",
+        dest="filename",
+        required=True,
+        type=str,
+        help="input file (xls(x))",
+    )
+    _ = parg.add_argument(
+        "-s",
+        "--sheet",
+        dest="sheets",
+        type=str,
+        help="worksheet name (multiple times possible). If omitted, all worksheets are parsed.",
+        action="append",
+    )
+
     # parg.add_argument("-b", "--booktabs", dest="booktabs", type=bool, default=True,
     #                   help="(True/False) Use the booktabs package functions to make prettier horizontal lines. Default: True.")
     # parg.add_argument("-t", "--tabular", dest="tabular", type=bool, default=True,
@@ -81,19 +101,57 @@ def main():
     #                  help="--roundto (int) If specified, rounds all numbers in the table to the given number of decimal places")
     # parg.add_argument("--thsep", dest="thsep", type=str, default="'",
     #                  help="Thousands separator, defaults to ' (Yes, becasue it is nicely unambiguous because some countries use a decimal comma!)")
-    parg.add_argument("-c", "--caption", dest="caption", type=str,
-                      help="If specified, include a table caption. Implies --longtable=True")
-    parg.add_argument("--label", dest="label", type=str,
-                      help="--label=labeltext: Includes a \label{tabletext} with the caption. Only has an effect if --caption is defined.")
-    parg.add_argument("-w", "--widths", dest="colwidths", type=str, default=None,
-                      help="--widths=n.n[em|cm],...  Comma separated list with column widths specified in valid LaTeX units, or a fraction of the textwidth if unit is omitted.")
-    parg.add_argument("--vfix", dest="vfix", type=str, default=None,
-                      help="--vfix=n.n[ex,cm] indicates the correction in LaTeX units to shift the content of vertically merged cells. If omitted defaults to -#mergedrows/2.0[ex]")
-    parg.add_argument("--nosheetcaption", dest="nosheetcaption", default=False, action='store_true',
-                      help="Do not use the worksheet name as the caption name when no explicit caption is given. The effect is no caption.")
-    parg.add_argument("-e", "--with-stderr", dest="withstderr", default=False, action='store_true',
-                      help="Use an internal redirect 2>&1 instead of the default 2>/dev/null.")
-    parg.add_argument("--small", dest="smalltext", default=False, action='store_true', help="Use smaller text in the table")
+
+    _ = parg.add_argument(
+        "-c",
+        "--caption",
+        dest="caption",
+        type=str,
+        help="If specified, include a table caption. Implies --longtable=True",
+    )
+    _ = parg.add_argument(
+        "--label",
+        dest="label",
+        type=str,
+        help=r"--label=labeltext: Includes a \label{tabletext} with the caption. Only has an effect if --caption is defined.",
+    )
+    _ = parg.add_argument(
+        "-w",
+        "--widths",
+        dest="colwidths",
+        type=str,
+        default=None,
+        help="--widths=n.n[em|cm],...  Comma separated list with column widths specified in valid LaTeX units, or a fraction of the textwidth if unit is omitted.",
+    )
+    _ = parg.add_argument(
+        "--vfix",
+        dest="vfix",
+        type=str,
+        default=None,
+        help="--vfix=n.n[ex,cm] indicates the correction in LaTeX units to shift the content of vertically merged cells. If omitted defaults to -#mergedrows/2.0[ex]",
+    )
+    _ = parg.add_argument(
+        "--nosheetcaption",
+        dest="nosheetcaption",
+        default=False,
+        action="store_true",
+        help="Do not use the worksheet name as the caption name when no explicit caption is given. The effect is no caption.",
+    )
+    _ = parg.add_argument(
+        "-e",
+        "--with-stderr",
+        dest="withstderr",
+        default=False,
+        action="store_true",
+        help="Use an internal redirect 2>&1 instead of the default 2>/dev/null.",
+    )
+    _ = parg.add_argument(
+        "--small",
+        dest="smalltext",
+        default=False,
+        action="store_true",
+        help="Use smaller text in the table",
+    )
 
     optarg = parg.parse_args()
     # automatically exits on error, so we have the required arguments when we arrive here
@@ -102,9 +160,9 @@ def main():
     # so redirect, unless user wants debug output in the final document (sensitive to invalid LaTeX characters!)
     # fd = os.open('/dev/null', os.O_WRONLY)
     if optarg.withstderr:
-        os.dup2(1, 2) # equivalent of appending 2>&1 to the command line
+        os.dup2(1, 2)  # equivalent of appending 2>&1 to the command line
     else:
-        fd = os.open('/dev/null', os.O_WRONLY)
+        fd = os.open("/dev/null", os.O_WRONLY)
         os.dup2(fd, 2)
 
     harmoniseOpt(optarg)
@@ -127,8 +185,17 @@ def main():
             if l is None and not optarg.nosheetcaption:
                 l = caption2label(c)
 
-            print(wb.getTeX(s, caption=c, label=l, colwidths=optarg.colwidths, vfix=optarg.vfix, smalltext=optarg.smalltext))
-            print() # linefeed, on to the next table (if any)
+            print(
+                wb.getTeX(
+                    s,
+                    caption=c,
+                    label=l,
+                    colwidths=optarg.colwidths,
+                    vfix=optarg.vfix,
+                    smalltext=optarg.smalltext,
+                )
+            )
+            print()  # linefeed, on to the next table (if any)
 
 
 # FIXME: (How???) not able to make imports work for both `poetry run xls2latex`` and `python xls2latex/main.py`
@@ -138,5 +205,3 @@ def main():
 #     import main
 #     main.main()
 # else:
-if __name__ == "__main__":
-    main()

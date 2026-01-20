@@ -2,37 +2,69 @@
   description = "xls2latex converts xls(x) worksheets to LaTeX tables (best used with pandoc(omatic))";
 
   inputs = {
-    flake-utils.url = "github:numtide/flake-utils";
-    # nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    poetry2nix = {
-      url = "github:nix-community/poetry2nix";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+
+    pyproject-nix = {
+      url = "github:pyproject-nix/pyproject.nix";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    uv2nix = {
+      url = "github:pyproject-nix/uv2nix";
+      inputs = {
+        pyproject-nix.follows = "pyproject-nix";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
+
+    pyproject-build-systems = {
+      url = "github:pyproject-nix/build-system-pkgs";
+      inputs = {
+        pyproject-nix.follows = "pyproject-nix";
+        uv2nix.follows = "uv2nix";
+        nixpkgs.follows = "nixpkgs";
+      };
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, poetry2nix }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        # see https://github.com/nix-community/poetry2nix/tree/master#api for more functions and examples.
+  outputs = {
+    nixpkgs,
+    pyproject-nix,
+    uv2nix,
+    pyproject-build-systems,
+    ...
+  }: let
+    inherit (nixpkgs) lib;
+    forAllSystems = lib.genAttrs lib.systems.flakeExposed;
+
+    workspace = uv2nix.lib.workspace.loadWorkspace {workspaceRoot = ./.;};
+
+    overlay = workspace.mkPyprojectOverlay {
+      sourcePreference = "wheel";
+    };
+
+    # editableOverlay = workspace.mkEditablePyprojectOverlay {
+    #   root = "$REPO_ROOT";
+    # };
+
+    pythonSets = forAllSystems (
+      system: let
         pkgs = nixpkgs.legacyPackages.${system};
-        inherit (poetry2nix.lib.mkPoetry2Nix { inherit pkgs; }) mkPoetryApplication;
-        xls2latex = pkgs.callPackage ./default.nix { inherit mkPoetryApplication; };# mkPoetryApplication { projectDir = self; };
+        python = pkgs.python3;
       in
-
-      {
-        overlays.default = final: prev: {
-          inherit xls2latex;
-        };
-
-        packages = rec {
-          # xls2latex = pkgs.callPackage ./default.nix { inherit mkPoetryApplication; inherit (pkgs) lib; };# mkPoetryApplication { projectDir = self; };
-          inherit xls2latex;
-          default = /* self.packages. */xls2latex;
-        };
-
-        devShells.default = pkgs.mkShell {
-          inputsFrom = [ xls2latex ];
-          packages = [ pkgs.poetry ];
-        };
-      });
+        (pkgs.callPackage pyproject-nix.build.packages {
+          inherit python;
+        }).overrideScope
+        (
+          lib.composeManyExtensions [
+            pyproject-build-systems.overlays.wheel
+            overlay
+          ]
+        )
+    );
+  in {
+    packages = forAllSystems (system: {
+      default = pythonSets.${system}.mkVirtualEnv "xls2latex-env" workspace.deps.default;
+    });
+  };
 }
